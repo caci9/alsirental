@@ -189,8 +189,8 @@ def create_checkout_session(request, reservation_id):
                 'quantity': 1,
             }],
             mode='payment',
-            success_url='http://localhost:8000/success/',
-            cancel_url='http://localhost:8000/cancel/',
+            success_url='https://alsirental.up.railway.app/success/',
+            cancel_url='https://alsirental.up.railway.app',
         )
 
         return JsonResponse({'sessionId': checkout_session.id})
