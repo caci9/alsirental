@@ -139,6 +139,5 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://alsirental.up.railway.app/'
-    
+    'https://alsirental.up.railway.app'
 ]
