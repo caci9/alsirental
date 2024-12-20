@@ -119,24 +119,37 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <h3>ALSI Car Rental</h3>
-        <ul class="list-unstyled">
-            {% if user.is_authenticated %}
-                <li><a href="#">Welcome, {{ user.username }}</a></li>
-                <li><a href="{% url 'singout' %}">Logout</a></li>
-            {% else %}
-                <li><a href="{% url 'signin' %}">Login</a></li>
-                <li><a href="{% url 'signup' %}">Register</a></li>
-            {% endif %}
-            <li class="{% if request.path == '/qera/home/' %}active{% endif %}">
-                <a href="{% url 'qera:home' %}"><i class="fas fa-home"></i> Home</a>
-            </li>
-            <li class="{% if request.path == '/qera/about_us/' %}active{% endif %}">
-                <a href="{% url 'qera:about_us' %}"><i class="fas fa-info-circle"></i> About Us</a>
-            </li>
-        </ul>
+<div class="sidebar" id="sidebar">
+    <h3>ALSI Car Rental</h3>
+    <ul class="list-unstyled">
+        {% if user.is_authenticated %}
+            <li><a href="#">Welcome, {{ user.username }}</a></li>
+            <li><a href="{% url 'singout' %}">Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'signin' %}">Login</a></li>
+            <li><a href="{% url 'signup' %}">Register</a></li>
+        {% endif %}
+        <li class="{% if request.path == '/qera/home/' %}active{% endif %}">
+            <a href="{% url 'qera:home' %}"><i class="fas fa-home"></i> Home</a>
+        </li>
+        <li class="{% if request.path == '/qera/about_us/' %}active{% endif %}">
+            <a href="{% url 'qera:about_us' %}"><i class="fas fa-info-circle"></i> About Us</a>
+        </li>
+    </ul>
+
+    <!-- Contact Information -->
+    <div class="mt-4 px-3">
+        <p><strong>Contact Us for Reservations:</strong></p>
+        <p>
+            <i class="fab fa-whatsapp"></i> <a href="https://wa.me/33659904003" target="_blank" style="color: white; text-decoration: none;">WhatsApp</a><br>
+
+            <i class="fas fa-envelope"></i> <a href="mailto:alsirental@gmail.com" style="color: white; text-decoration: none;">Email</a><br>
+
+            <i class="fab fa-instagram"></i> <a href="https://www.instagram.com/alsi_car_rental?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" style="color: white; text-decoration: none;">Instagram</a>
+        </p>
     </div>
+</div>
+
     
 
     <!-- Main Content -->

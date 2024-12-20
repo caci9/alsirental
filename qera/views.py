@@ -18,6 +18,7 @@ from django.db.models import Q
 from .models import Car, Reservation
 from .utils import send_payment_email
 from django.utils.dateparse import parse_datetime
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 
@@ -139,27 +140,36 @@ def calculate_total_cost(request):
 
 @login_required(login_url='signup')
 def success(request):
-    reservation = Reservation.objects.filter().last()
+    try:
+        # Fetch the last reservation made by the current user
+        reservation = Reservation.objects.filter(user=request.user).last()
 
-    if reservation and not reservation.email_sent:
-        # Send email to user
-        user_email = request.user.email
-        username = request.user.get_full_name() or request.user.username
-        amount = reservation.total_cost
-
-        email_sent = send_payment_email(user_email, username, amount, reservation.id, reservation.car)
-
-        if email_sent:
-            # Mark the email as sent
-            reservation.email_sent = True
-            reservation.save()
-            print(f"Email successfully sent to {user_email}")
-        else:
-            print(f"Failed to send email to {user_email}")
-    else:
         if reservation:
-            print("Email already sent for this reservation.")
+            if not reservation.email_sent:
+                # Get user details
+                user_email = request.user.email
+                username = request.user.get_full_name() or request.user.username
+                amount = reservation.total_cost
 
+                # Try to send the email
+                email_sent = send_payment_email(user_email, username, amount, reservation.id, reservation.car)
+
+                if email_sent:
+                    # Mark email as sent
+                    reservation.email_sent = True
+                    reservation.save()
+                    messages.success(request, f"Payment confirmation email successfully sent to {user_email}.")
+                else:
+                    messages.error(request, "Failed to send payment confirmation email.")
+            else:
+                messages.info(request, "Email confirmation for this reservation has already been sent.")
+        else:
+            messages.error(request, "No reservations found for this user.")
+
+    except ObjectDoesNotExist:
+        messages.error(request, "Reservation not found.")
+
+    # Render success page with reservation details
     return render(request, 'qera/success.html', {'reservation': reservation})
 
 
@@ -189,8 +199,11 @@ def create_checkout_session(request, reservation_id):
                 'quantity': 1,
             }],
             mode='payment',
-            success_url='https://alsirental.up.railway.app/success/',
+           # success_url='https://alsirental.up.railway.app/success/',
             cancel_url='https://alsirental.up.railway.app',
+            success_url='http://127.0.0.1:8000/success/',
+            #success_url='https://alsirental.up.railway.app/success/',
+            
         )
 
         return JsonResponse({'sessionId': checkout_session.id})
