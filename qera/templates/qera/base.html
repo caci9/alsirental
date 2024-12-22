@@ -150,23 +150,7 @@
     </div>
 </div>
 
-<ul class="list-unstyled">
-    {% if user.is_authenticated %}
-        <li><a href="#">Welcome, {{ user.username }}</a></li>
-        <li><a href="{% url 'singout' %}">Logout</a></li>
-    {% else %}
-        <li><a href="{% url 'signin' %}">Login</a></li>
-        <li><a href="{% url 'signup' %}">Register</a></li>
-    {% endif %}
-    <li class="{% if request.path == '/qera/home/' %}active{% endif %}">
-        <a href="{% url 'qera:home' %}"><i class="fas fa-home"></i> Home</a>
-    </li>
-    <li class="{% if request.path == '/qera/about_us/' %}active{% endif %}">
-        <a href="{% url 'qera:about_us' %}"><i class="fas fa-info-circle"></i> About Us</a>
-    </li>
-</ul>
 
-    
 
     <!-- Main Content -->
     <div class="content" id="content">
