@@ -1,6 +1,6 @@
 import stripe
 import json
-from datetime import datetime
+from datetime import datetime, date
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -29,22 +29,46 @@ stripe.publice_key = settings.STRIPE_PUBLIC_KEY
 def home(request):
     pickup_date = request.GET.get('pickup_date')
     return_date = request.GET.get('return_date')
+    today = date.today()
+    error_message = None
 
-    if pickup_date and return_date:
-        from datetime import datetime
-        pickup_date = datetime.strptime(pickup_date, "%Y-%m-%d").date()
-        return_date = datetime.strptime(return_date, "%Y-%m-%d").date()
+    try:
+        if pickup_date and return_date:
+            # Parse the dates
+            pickup_date = datetime.strptime(pickup_date, "%Y-%m-%d").date()
+            return_date = datetime.strptime(return_date, "%Y-%m-%d").date()
 
-        reserved_cars = Reservation.objects.filter(
-            Q(pickup_date__lte=return_date, return_date__gte=pickup_date)
-        ).values_list('car_id', flat=True)
+            # Validate the dates
+            if pickup_date < today or return_date < today:
+                raise ValueError("Dates cannot be in the past.")
+            if pickup_date > return_date:
+                raise ValueError("Pickup date cannot be after return date.")
 
-        cars = Car.objects.exclude(id__in=reserved_cars)
-    else:
+            # Find reserved cars
+            reserved_cars = Reservation.objects.filter(
+                Q(pickup_date__lte=return_date, return_date__gte=pickup_date)
+            ).values_list('car_id', flat=True)
+
+            # Exclude reserved cars
+            cars = Car.objects.exclude(id__in=reserved_cars)
+        else:
+            # Show all cars by default
+            cars = Car.objects.all()
+
+    except ValueError as e:
+        # Handle validation errors
+        error_message = str(e)
         cars = Car.objects.all()
 
-    return render(request, 'qera/home.html', {'cars': cars})
-
+    # Render the template with cars and error message if any
+    context = {
+        'cars': cars,
+        'today': today,
+        'pickup_date': pickup_date if pickup_date else '',
+        'return_date': return_date if return_date else '',
+        'error_message': error_message,
+    }
+    return render(request, 'qera/home.html', context)
 
 def car_detail(request, car_id):
     car = get_object_or_404(Car, id=car_id)
