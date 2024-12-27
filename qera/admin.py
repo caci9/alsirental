@@ -1,18 +1,24 @@
 from django.contrib import admin
 from .models import *
+from django.contrib import admin
+from .models import Customer, Car, Reservation
 
 
 # Register your models here.
-admin.site.register(Car)
-
 admin.site.register(Payment)
 admin.site.register(Reservation)
-admin.site.register(CarImage)
 
 
+class ImagesAdmin(admin.ModelAdmin):
+    list_display = ('car', 'image')
+    search_fields = ('car__name', )
 
-from django.contrib import admin
-from .models import Customer, Car, Reservation
+
+class CarAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'winter_rental_price', 'summer_rental_price', 'year', 'transmission_type')
+    search_fields = ('id', 'transmission_type', 'name') 
+    list_filter = ('name',)
+    list_editable = ('winter_rental_price', 'summer_rental_price')
 
 
 class CustomerAdmin(admin.ModelAdmin):
@@ -27,4 +33,6 @@ class CustomerAdmin(admin.ModelAdmin):
         obj.save()
 
 admin.site.register(Customer, CustomerAdmin)
+admin.site.register(Car, CarAdmin)
+admin.site.register(CarImage, ImagesAdmin)
 
